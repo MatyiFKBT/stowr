@@ -11,17 +11,33 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
-	"stowr/internal/apply"
-	"stowr/internal/repo"
-	"stowr/internal/report"
-	"stowr/internal/scan"
-	"stowr/internal/xdg"
+	"github.com/MatyiFKBT/stowr/internal/apply"
+	"github.com/MatyiFKBT/stowr/internal/repo"
+	"github.com/MatyiFKBT/stowr/internal/report"
+	"github.com/MatyiFKBT/stowr/internal/scan"
+	"github.com/MatyiFKBT/stowr/internal/xdg"
 )
 
 // version is stamped at release time with -ldflags "-X main.version=...".
-var version = "0.1.0"
+// When it is empty, the version recorded by `go install <module>@<version>` in
+// the build info is used instead.
+var version = ""
+
+// buildVersion reports the version to display.
+func buildVersion() string {
+	if version != "" {
+		return version
+	}
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if v := info.Main.Version; v != "" && v != "(devel)" {
+			return v
+		}
+	}
+	return "devel"
+}
 
 // stringList collects a repeatable, comma-separated flag.
 type stringList []string
@@ -71,7 +87,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return err
 	}
 	if *showVersion {
-		fmt.Fprintf(stdout, "stowr %s\n", version)
+		fmt.Fprintf(stdout, "stowr %s\n", buildVersion())
 		return nil
 	}
 	if *minFiles < 0 || *maxFiles < *minFiles {

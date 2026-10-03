@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"stowr/internal/repo"
+	"github.com/MatyiFKBT/stowr/internal/repo"
 )
 
 // Status classifies an entry.

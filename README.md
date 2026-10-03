@@ -34,6 +34,19 @@ ALREADY STOWED (1)
 
 ## Install
 
+With Go 1.22 or newer:
+
+```sh
+go install github.com/MatyiFKBT/stowr@latest
+```
+
+That writes `stowr` to `$GOBIN` (or `$GOPATH/bin`) and reports the module
+version in `stowr --version`. Note that `go get` no longer installs binaries —
+`go install pkg@version` is the supported form since Go 1.17.
+
+Prebuilt binaries for `linux`, `darwin` and `windows` are attached to every
+[release](https://github.com/MatyiFKBT/stowr/releases). From a checkout:
+
 ```sh
 go build -o ~/.local/bin/stowr .
 ```

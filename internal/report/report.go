@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"stowr/internal/scan"
+	"github.com/MatyiFKBT/stowr/internal/scan"
 )
 
 // Options controls rendering.

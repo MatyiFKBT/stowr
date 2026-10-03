@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"stowr/internal/repo"
-	"stowr/internal/scan"
+	"github.com/MatyiFKBT/stowr/internal/repo"
+	"github.com/MatyiFKBT/stowr/internal/scan"
 )
 
 type fixture struct {

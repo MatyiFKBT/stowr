@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"stowr/internal/repo"
-	"stowr/internal/scan"
+	"github.com/MatyiFKBT/stowr/internal/repo"
+	"github.com/MatyiFKBT/stowr/internal/scan"
 )
 
 // Options controls how a candidate is applied.

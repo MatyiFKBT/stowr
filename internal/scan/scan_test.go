@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"stowr/internal/repo"
+	"github.com/MatyiFKBT/stowr/internal/repo"
 )
 
 // tree builds a synthetic config directory and repository.
