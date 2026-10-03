@@ -115,8 +115,8 @@ Every push to `main` (including merges) cuts a release automatically:
 
 - the version is the next patch after the highest stable `vX.Y.Z` tag
   (`v0.1.0` when there is none), so merging after `v0.1.1` releases `v0.1.2`
-- include `[skip release]` in the commit message to publish nothing, for
-  example for a docs-only merge
+- put `[skip release]` in the commit *subject* to publish nothing, for example
+  for a docs-only merge (a mention in the body does not count)
 - pushing a `vX.Y.Z` tag releases that exact version instead
 - `workflow_dispatch` takes an explicit version
 

@@ -39,7 +39,7 @@ jobs:
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             # A pushed tag names its own release.
             version="${GITHUB_REF_NAME}"
-          elif printf '%s' "$(git log -1 --pretty=%B)" | grep -qF '[skip release]'; then
+          elif printf '%s' "$(git log -1 --pretty=%s)" | grep -qF '[skip release]'; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Commit asked for [skip release]"
             exit 0
