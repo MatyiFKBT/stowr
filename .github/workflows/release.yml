@@ -2,13 +2,66 @@ name: Release
 
 on:
   push:
+    branches: [main, master]
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (defaults to the next patch after the latest tag)
+        required: false
+        type: string
+
+# Serialise releases so two merges landing close together cannot compute the
+# same next version.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.compute.outputs.version }}
+      skip: ${{ steps.compute.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # tags are needed to compute the next version
+      - name: Compute version
+        id: compute
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            # A pushed tag names its own release.
+            version="${GITHUB_REF_NAME}"
+          elif printf '%s' "$(git log -1 --pretty=%B)" | grep -qF '[skip release]'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Commit asked for [skip release]"
+            exit 0
+          elif [ -n "${INPUT_VERSION}" ]; then
+            version="${INPUT_VERSION}"
+          else
+            # Next patch after the highest stable vX.Y.Z tag.
+            latest="$(git tag --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+            if [ -z "${latest}" ]; then
+              version="v0.1.0"
+            else
+              base="${latest#v}"
+              version="v${base%.*}.$(( ${base##*.} + 1 ))"
+            fi
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${version}"
+
   build:
+    needs: version
+    if: needs.version.outputs.skip != 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -38,6 +91,7 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           set -euo pipefail
           name="stowr-${GOOS}-${GOARCH}"
@@ -45,7 +99,7 @@ jobs:
             name="${name}.exe"
           fi
           mkdir -p dist
-          go build -trimpath -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "dist/${name}" .
+          go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o "dist/${name}" .
           if [ "$GOOS" = linux ] && [ "$GOARCH" = amd64 ]; then
             ./dist/${name} --version
           fi
@@ -56,10 +110,11 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: build
+    needs: [version, build]
+    if: needs.version.outputs.skip != 'true'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # creating the tag and the release
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -67,5 +122,7 @@ jobs:
           merge-multiple: true
       - uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ needs.version.outputs.version }}
+          name: ${{ needs.version.outputs.version }}
           files: dist/*
           generate_release_notes: true

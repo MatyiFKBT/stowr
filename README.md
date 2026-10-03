@@ -109,6 +109,27 @@ The backup is a plain recursive copy: file modes and symlinks are preserved,
 sockets and devices are skipped. Moving across filesystems fails with a clear
 error, since `stow` itself cannot span devices either.
 
+## Releases
+
+Every push to `main` (including merges) cuts a release automatically:
+
+- the version is the next patch after the highest stable `vX.Y.Z` tag
+  (`v0.1.0` when there is none), so merging after `v0.1.1` releases `v0.1.2`
+- include `[skip release]` in the commit message to publish nothing, for
+  example for a docs-only merge
+- pushing a `vX.Y.Z` tag releases that exact version instead
+- `workflow_dispatch` takes an explicit version
+
+Each release builds and tests five targets (`linux`/`darwin` × `amd64`/`arm64`,
+`windows/amd64`) with the version stamped in via
+`-ldflags "-X main.version=..."`, and attaches the binaries to a GitHub Release
+with generated notes. An in-flight release is never cancelled, and releases run
+one at a time so two merges cannot pick the same version.
+
+Not done: bumping minor or major automatically from commit messages
+(conventional-commit driven versioning) — a patch bump is deterministic and
+predictable.
+
 ## Testing
 
 ```sh
