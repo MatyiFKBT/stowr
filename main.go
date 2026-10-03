@@ -20,7 +20,8 @@ import (
 	"stowr/internal/xdg"
 )
 
-const version = "0.1.0"
+// version is stamped at release time with -ldflags "-X main.version=...".
+var version = "0.1.0"
 
 // stringList collects a repeatable, comma-separated flag.
 type stringList []string
