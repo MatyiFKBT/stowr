@@ -42,7 +42,9 @@ go install github.com/MatyiFKBT/stowr@latest
 
 That writes `stowr` to `$GOBIN` (or `$GOPATH/bin`) and reports the module
 version in `stowr --version`. Note that `go get` no longer installs binaries —
-`go install pkg@version` is the supported form since Go 1.17.
+`go install pkg@version` is the supported form since Go 1.17 — and that Go
+module paths are case sensitive, so the capitalised `MatyiFKBT` is required
+even though GitHub itself would resolve it either way.
 
 Prebuilt binaries for `linux`, `darwin` and `windows` are attached to every
 [release](https://github.com/MatyiFKBT/stowr/releases). From a checkout:
