@@ -1,5 +1,7 @@
 # stowr
 
+[![CI](https://github.com/MatyiFKBT/stowr/actions/workflows/ci.yml/badge.svg)](https://github.com/MatyiFKBT/stowr/actions/workflows/ci.yml)
+
 Recommends directories in `$XDG_CONFIG_HOME` that are ready to be managed with
 [GNU stow](https://www.gnu.org/software/stow/): small app config directories
 holding one or two config files that are not linked into your dotfiles
